@@ -4,8 +4,16 @@
 ])
 
 @section('content')
-    <div class="container">
-        <div class="row">
+    <div class="container-fluid px-4">
+        {{-- Messages flash --}}
+        @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
+
+        <div class="row mt-4">
             {{-- Image du livre --}}
             <div class="col-md-4 mb-4">
                 <div class="card">
@@ -31,6 +39,21 @@
                         <i class="fas fa-heart"></i> Ajouter aux favoris
                         <small>(Séance 5)</small>
                     </button>
+                </div>
+
+                {{-- Boutons CRUD (Séance 3) --}}
+                <div class="d-grid gap-2 mt-3">
+                    <a href="{{ route('livres.edit', $livre->id) }}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    <form action="{{ route('livres.destroy', $livre->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger w-100" 
+                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce livre ?')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </form>
                 </div>
             </div>
 

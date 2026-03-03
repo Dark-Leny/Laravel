@@ -6,22 +6,34 @@
 ])
 
 @section('content')
-<div class="container">
-    {{-- En-tête avec statistiques --}}
-    <div class="row mb-4">
-                            <div class="col-12 text-center mb-4">
-                        <i class="fas fa-book"></i>
-                        <h1 class="display-5 fw-bold text-dark mb-3">Catalogue des livres</h1>
-                    <p class="text-muted">
-                        {{ $stats['totalLivres'] }} livres • {{ $stats['livresDisponibles'] }} disponibles • {{ $stats['totalCategories'] }} catégories
-                    </p>
-                </div>
-                <div>
-                    <a href="{{ route('livres.search') }}" class="btn btn-outline-primary">
-                        <i class="fas fa-search"></i> Recherche avancée
-                    </a>
-                </div>
-            </div>
+<div class="container-fluid px-4">
+    {{-- Messages flash --}}
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        <i class="fas fa-check-circle"></i> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
+    {{-- En-tête avec statistiques et bouton créer --}}
+    <div class="row mb-4 mt-4">
+        <div class="col-12 col-md-8 text-center text-md-start">
+            <h1 class="display-5 fw-bold text-dark mb-2">
+                <i class="fas fa-book"></i> Catalogue des livres
+            </h1>
+            <p class="text-muted fs-5">
+                <i class="fas fa-book-open"></i> {{ $stats['totalLivres'] }} livres • 
+                <i class="fas fa-check"></i> {{ $stats['livresDisponibles'] }} disponibles • 
+                <i class="fas fa-folder"></i> {{ $stats['totalCategories'] }} catégories
+            </p>
+        </div>
+        <div class="col-12 col-md-4 d-flex gap-2 justify-content-center justify-content-md-end">
+            <a href="{{ route('livres.create') }}" class="btn btn-success">
+                <i class="fas fa-plus-circle"></i> Nouveau livre
+            </a>
+            <a href="{{ route('livres.search') }}" class="btn btn-outline-primary">
+                <i class="fas fa-search"></i> Recherche
+            </a>
         </div>
     </div>
 
@@ -40,19 +52,5 @@
         </div>
         @endforelse
     </div>
-
-    {{-- Message informatif --}}
-    @if(count($livres) > 0)
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="alert alert-light">
-                <i class="fas fa-lightbulb"></i>
-                <strong>Information :</strong> 
-                Ces données sont statiques pour la Séance 1. 
-                En Séance 2, nous connecterons une vraie base de données PostgreSQL !
-            </div>
-        </div>
-    </div>
-    @endif
 </div>
 @endsection

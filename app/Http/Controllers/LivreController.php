@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Livre;
 use App\Models\Categorie;
+use App\Http\Requests\StoreLivreRequest;
+use App\Http\Requests\UpdateLivreRequest;
 
 class LivreController extends Controller
 {
@@ -35,20 +37,81 @@ class LivreController extends Controller
     }
 
     /**
+     * Affichage formulaire création
+     * SÉANCE 3 : Afficher le formulaire pour créer un livre
+     */
+    public function create()
+    {
+        $categories = Categorie::actives()->get();
+        
+        return view('livres.create', [
+            'categories' => $categories
+        ]);
+    }
+
+    /**
+     * Sauvegarde d'un livre créé
+     * SÉANCE 3 : Stocker les données validées et rediriger
+     */
+    public function store(StoreLivreRequest $request)
+    {
+        // Utilisation de la Form Request Validation pour la validation
+        $livre = Livre::create($request->validated());
+
+        return redirect()->route('livres.show', $livre->id)
+            ->with('success', "Le livre '{$livre->titre}' a été créé avec succès!");
+    }
+
+    /**
      * Affichage détail avec paramètre d'URL et Eloquent
      * SÉANCE 2 : Utiliser Eloquent pour récupérer un enregistrement spécifique
      */
-    public function show($id)
+    public function show(Livre $livre)
     {
-        // Conversion de l'ID en entier pour éviter les erreurs
-        $id = (int) $id;
-
-        // Récupération du livre avec sa catégorie via Eloquent
-        $livre = Livre::with('categorie')->findOrFail($id);
-
+        $livre->load('categorie');
+        
         return view('livres.show', [
             'livre' => $livre
         ]);
+    }
+
+    /**
+     * Affichage formulaire édition
+     * SÉANCE 3 : Route Model Binding - Récupérer le livre et afficher le formulaire
+     */
+    public function edit(Livre $livre)
+    {
+        $categories = Categorie::actives()->get();
+        
+        return view('livres.edit', [
+            'livre' => $livre,
+            'categories' => $categories
+        ]);
+    }
+
+    /**
+     * Mise à jour d'un livre
+     * SÉANCE 3 : Valider et mettre à jour les données
+     */
+    public function update(UpdateLivreRequest $request, Livre $livre)
+    {
+        $livre->update($request->validated());
+
+        return redirect()->route('livres.show', $livre->id)
+            ->with('success', "Le livre '{$livre->titre}' a été modifié avec succès!");
+    }
+
+    /**
+     * Suppression d'un livre
+     * SÉANCE 3 : Supprimer le livre et rediriger
+     */
+    public function destroy(Livre $livre)
+    {
+        $titre = $livre->titre;
+        $livre->delete();
+
+        return redirect()->route('livres.index')
+            ->with('success', "Le livre '{$titre}' a été supprimé avec succès!");
     }
 
     /**

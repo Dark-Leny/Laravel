@@ -105,13 +105,37 @@
                 </ul>
                 
                 {{-- Barre de recherche --}}
-                <form class="d-flex" action="{{ route('livres.search') }}" method="GET">
-                    <input class="form-control me-2" type="search" name="q" 
+                <form class="d-flex me-3" action="{{ route('livres.search') }}" method="GET">
+                    <input class="form-control form-control-sm me-2" type="search" name="q" 
                            placeholder="Rechercher un livre..." value="{{ request('q') }}">
-                    <button class="btn btn-outline-light" type="submit">
+                    <button class="btn btn-outline-light btn-sm" type="submit">
                         <i class="fas fa-search"></i>
                     </button>
                 </form>
+
+                {{-- Menu authentification --}}
+                @auth
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-light me-2">
+                        <i class="fas fa-user-circle"></i> {{ Auth::user()->name }}
+                    </span>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> Déconnexion
+                        </button>
+                    </form>
+                </div>
+                @else
+                <div class="d-flex gap-2">
+                    <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sign-in-alt"></i> Connexion
+                    </a>
+                    <a href="{{ route('register') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-user-plus"></i> Inscription
+                    </a>
+                </div>
+                @endauth
             </div>
         </div>
     </nav>
