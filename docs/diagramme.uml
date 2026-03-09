@@ -1,0 +1,97 @@
+@startuml laravel
+left to right direction
+
+' Application de gestion de bibliothèque
+
+/'
+
+Diagramme de cas
+d'utilisation
+
+'/
+
+title Application de gestion de bibliothèque
+
+actor "Utilisateur" as user
+
+package Client {
+	actor "Utilisateur Demo" as utilisateur_demo
+    actor "Totoro" as totoro
+	user <|-- utilisateur_demo
+    user <|-- totoro
+}
+
+package Bibliothécaire {
+	actor "Bibliothécaire Demo" as bibliothecaire_demo
+	user <|-- bibliothecaire_demo
+}
+
+package Administrateur {
+	actor "Admin BiblioTech" as admin_bibliotech
+	user <|-- admin_bibliotech
+}
+
+
+rectangle "Système de gestion de bibliothèque" {
+
+    usecase "Consulter le catalogue" as UC1
+    usecase "Voir les favoris" as UC2
+    usecase "Ajouter les favoris" as UC3
+    usecase "Retirer les favoris" as UC4
+	usecase "Créer les livres" as UC5
+	usecase "Modifier les livres" as UC6
+    usecase "Supprimer les livres" as UC7
+    usecase "Gérer les catégories" as UC8
+
+}
+
+utilisateur_demo --> UC1
+totoro --> UC1
+bibliothecaire_demo --> UC1
+admin_bibliotech --> UC1
+
+
+utilisateur_demo --> UC2
+totoro --> UC2
+bibliothecaire_demo --> UC2
+admin_bibliotech --> UC2
+
+      
+bibliothecaire_demo --> UC3
+admin_bibliotech --> UC3
+
+      
+bibliothecaire_demo --> UC4
+admin_bibliotech --> UC4
+
+      
+bibliothecaire_demo --> UC5
+admin_bibliotech --> UC5
+
+
+bibliothecaire_demo --> UC6
+admin_bibliotech --> UC6
+
+
+bibliothecaire_demo --> UC7
+admin_bibliotech --> UC7
+
+
+bibliothecaire_demo --> UC8
+admin_bibliotech --> UC8
+
+UC1 .left.> UC5 : <<include>>
+UC2 .left.> UC5 : <<include>>
+UC3 .left.> UC5 : <<include>>
+UC4 .left.> UC5 : <<include>>
+
+UC1 .right.> UC6 : <<extend>>
+
+legend right
+= Légende du Diagramme
+* utilisateur_demo : représente un utilisateur par défault
+* bibliothecaire_demo : représente un bibliothécaire par défault
+* admin_bibliotech : représente un administrateur par défault
+end legend
+
+@enduml
