@@ -102,34 +102,40 @@
                 .finally(() => {
                     btn.disabled = false;
                     // Recharger la page après 2 secondes pour synchroniser avec le serveur
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
+                    // SEULEMENT si c'est un bibliothécaire qui fait l'action
+                    if ('{{ auth()->user()->isBibliothecaire() }}' === '1') {
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
+                    }
                 });
             });
         })();
         </script>
     @else
         {{-- Pour les non-bibliothécaires: afficher les favoris du bibliothécaire --}}
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i>
-            <strong>Favoris du bibliothécaire:</strong><br>
-            @php
-                $favorisByBibliothecaires = $livre->favoritedByUsers()
-                    ->where('role', '=', 'bibliothécaire')
-                    ->count();
-            @endphp
-            
-            @if ($favorisByBibliothecaires > 0)
-                Ce livre a été sélectionné comme favori par <strong>{{ $favorisByBibliothecaires }}</strong> 
-                bibliothécaire(s) {{ $favorisByBibliothecaires > 1 ? 'de notre équipe' : '' }}.
-                <br>
-                <small class="text-muted">Seuls les bibliothécaires peuvent gérer les favoris.</small>
-            @else
-                Ce livre n'a pas encore été sélectionné comme favori par les bibliothécaires.
-                <br>
-                <small class="text-muted">Seuls les bibliothécaires peuvent gérer les favoris.</small>
-            @endif
+        @php
+            $favorisByBibliothecaires = $livre->favoritedByUsers()
+                ->where('role', '=', 'bibliothécaire')
+                ->count();
+        @endphp
+        
+        <div class="alert alert-info fade show" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-star me-2" style="font-size: 1.2rem; color: #0d6efd;"></i>
+                <div>
+                    @if ($favorisByBibliothecaires > 0)
+                        <strong>📚 Favori du bibliothécaire!</strong><br>
+                        <small>Ce livre a été sélectionné comme favori par 
+                            <strong>{{ $favorisByBibliothecaires }}</strong> 
+                            bibliothécaire{{ $favorisByBibliothecaires > 1 ? '(s)' : '' }} de notre équipe.</small>
+                    @else
+                        <strong>📖 À découvrir</strong><br>
+                        <small>Ce livre n'a pas encore été sélectionné comme favori par les bibliothécaires, mais reste accessible à tous.</small>
+                    @endif
+                </div>
+            </div>
+            <small class="text-muted mt-2 d-block">Seuls les bibliothécaires peuvent gérer les favoris.</small>
         </div>
     @endauth
 @else
