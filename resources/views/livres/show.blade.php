@@ -35,10 +35,8 @@
                         </button>
                     @endif
 
-                    <button class="btn btn-outline-secondary">
-                        <i class="fas fa-heart"></i> Ajouter aux favoris
-                        <small>(Séance 5)</small>
-                    </button>
+                    {{-- Composant Favoris (Séance 5) --}}
+                    @include('components.favorite-button')
                 </div>
 
                 {{-- Boutons CRUD (Séance 3) --}}

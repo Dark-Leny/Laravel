@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccueilController;
 use App\Http\Controllers\LivreController;
+use App\Http\Controllers\FavoriteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,3 +72,25 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Logout (authentifié)
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+/*
+|--------------------------------------------------------------------------
+| SÉANCE 5 : Routes Favoris (Rôles et Permissions)
+|--------------------------------------------------------------------------
+| Focus : Gestion des rôles et permissions avancées
+| - Seuls les bibliothécaires peuvent ajouter des favoris
+| - Tous peuvent voir les favoris du bibliothécaire
+| - Contrôle d'accès basé sur les rôles
+*/
+
+Route::middleware('auth')->group(function () {
+    // Routes pour les favoris - Seul les bibliothécaires peuvent ajouter/retirer
+    Route::post('/livres/{livre}/favorite', [FavoriteController::class, 'store'])->name('favorite.store');
+    Route::delete('/livres/{livre}/favorite', [FavoriteController::class, 'destroy'])->name('favorite.destroy');
+    
+    // Route pour vérifier l'état de favoris (AJAX)
+    Route::get('/livres/{livre}/favorite/check', [FavoriteController::class, 'check'])->name('favorite.check');
+    
+    // Route pour voir les favoris du bibliothécaire (accessible à tous)
+    Route::get('/bibliothecaire/{user}/favoris', [FavoriteController::class, 'getBibliothecaireFavorites'])->name('favorite.bibliothecaire');
+});

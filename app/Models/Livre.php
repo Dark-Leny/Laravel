@@ -79,4 +79,28 @@ class Livre extends Model
     {
         return route('livre.show', $this->id);
     }
+
+    /**
+     * Les utilisateurs qui ont mis ce livre en favoris
+     */
+    public function favoritedByUsers()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'user_livre_favorite',
+            'livre_id',
+            'user_id'
+        )->withTimestamps();
+    }
+
+    /**
+     * Vérifier si le livre est favori pour un utilisateur
+     */
+    public function isFavoriteFor(?User $user = null)
+    {
+        if (is_null($user)) {
+            return false;
+        }
+        return $this->favoritedByUsers()->where('users.id', $user->id)->exists();
+    }
 }

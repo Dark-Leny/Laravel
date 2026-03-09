@@ -69,4 +69,17 @@ class User extends Authenticatable
     {
         return $this->role === 'user';
     }
+
+    /**
+     * Les favoris de l'utilisateur
+     */
+    public function favoriteBooks()
+    {
+        return $this->belongsToMany(
+            Livre::class,
+            'user_livre_favorite',
+            'user_id',
+            'livre_id'
+        )->withTimestamps();
+    }
 }
