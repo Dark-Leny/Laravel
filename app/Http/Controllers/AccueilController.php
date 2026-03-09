@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Livre;
 use App\Models\Categorie;
-
-
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class AccueilController extends Controller
 {
@@ -30,9 +30,22 @@ class AccueilController extends Controller
             ->take(3)
             ->get();
 
+        // Favoris des bibliothécaires
+        $livresFavoris = Livre::with('categorie', 'favoritedByUsers')
+            ->whereHas('favoritedByUsers', function ($query) {
+                $query->where('role', '=', 'bibliothécaire');
+            })
+            ->withCount(['favoritedByUsers as favoris_count' => function ($query) {
+                $query->where('role', '=', 'bibliothécaire');
+            }])
+            ->orderBy('favoris_count', 'desc')
+            ->take(6)
+            ->get();
+
         return view('welcome', [
             'stats' => $stats,
-            'livresEnVedette' => $livresEnVedette
+            'livresEnVedette' => $livresEnVedette,
+            'livresFavoris' => $livresFavoris
         ]);
     }
 }

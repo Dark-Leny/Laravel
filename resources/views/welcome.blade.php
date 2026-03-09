@@ -98,6 +98,74 @@
         @endif
     </div>
 
+    {{-- Favoris des Bibliothécaires --}}
+    <div class="row mb-5">
+        <div class="col-12 mb-4">
+            <h2>
+                <i class="fas fa-heart text-danger"></i>
+                Favoris des Bibliothécaires
+            </h2>
+            <p class="text-muted">Les livres sélectionnés par notre équipe de bibliothécaires</p>
+        </div>
+        
+        @if($livresFavoris && $livresFavoris->count() > 0)
+            @foreach($livresFavoris as $livre)
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-danger position-relative">
+                    {{-- Badge Favori --}}
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-danger rounded-pill">
+                            <i class="fas fa-heart"></i>
+                            {{ $livre->favoris_count }}
+                        </span>
+                    </div>
+
+                    {{-- Contenu de la carte --}}
+                    <div class="book-cover book-cover-{{ $livre->categorie->slug ?? 'default' }}" style="height: 200px;">
+                        <div class="book-title">{{ $livre->titre }}</div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate">{{ $livre->titre }}</h5>
+                        <p class="card-text text-muted small text-truncate">
+                            <i class="fas fa-user"></i> {{ $livre->auteur }}
+                        </p>
+                        
+                        @if($livre->categorie)
+                            <p class="card-text">
+                                <span class="badge" style="background-color: {{ $livre->categorie->couleur ?? '#6c757d' }}">
+                                    <i class="{{ $livre->categorie->icone ?? 'fas fa-tag' }}"></i>
+                                    {{ $livre->categorie->nom }}
+                                </span>
+                            </p>
+                        @endif
+
+                        <p class="card-text small text-muted">
+                            @if($livre->disponible)
+                                <i class="fas fa-check-circle text-success"></i> Disponible
+                            @else
+                                <i class="fas fa-clock text-warning"></i> Non disponible
+                            @endif
+                        </p>
+                    </div>
+                    
+                    <div class="card-footer bg-light border-top">
+                        <a href="{{ route('livres.show', $livre->id) }}" class="btn btn-sm btn-outline-primary w-100">
+                            <i class="fas fa-eye"></i> Consulter
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        @else
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i>
+                    Les bibliothécaires n'ont pas encore sélectionné de favoris.
+                </div>
+            </div>
+        @endif
+    </div>
     {{-- Appel à l'action & Fonctionnalités --}}
     <div class="row mt-5 mb-5">
         <div class="col-12">
