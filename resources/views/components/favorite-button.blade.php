@@ -2,62 +2,100 @@
 @auth
     @if (auth()->user()->isBibliothecaire())
         {{-- Bouton pour le bibliothécaire (peut ajouter/retirer des favoris) --}}
-        <button id="favorite-btn" 
-                class="btn btn-outline-secondary favorite-btn" 
+        <button class="btn btn-outline-secondary favorite-btn" 
                 data-livre-id="{{ $livre->id }}"
-                data-is-favorite="{{ $livre->isFavoriteFor(auth()->user()) ? 'true' : 'false' }}">
+                data-is-favorite="{{ $livre->isFavoriteFor(auth()->user()) ? '1' : '0' }}"
+                type="button">
             <i class="fas fa-heart"></i> 
-            <span id="favorite-text">
+            <span class="favorite-text">
                 {{ $livre->isFavoriteFor(auth()->user()) ? 'Retirer des favoris' : 'Ajouter aux favoris' }}
             </span>
         </button>
 
         <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const btn = document.getElementById('favorite-btn');
-            const livreid = btn.dataset.livreId;
-            let isFavorite = btn.dataset.isFavorite === 'true';
+        (function() {
+            const btn = document.querySelector('[data-livre-id]');
+            if (!btn) {
+                console.error('Bouton favoris non trouvé');
+                return;
+            }
+
+            const livreid = btn.getAttribute('data-livre-id');
+            const storageKey = `favorite_livre_${livreid}`;
+            
+            // Récupérer l'état du localStorage ou du data-attribute
+            let isFavorite = localStorage.getItem(storageKey) !== null 
+                ? localStorage.getItem(storageKey) === '1'
+                : btn.getAttribute('data-is-favorite') === '1';
 
             function updateButtonState() {
-                const textSpan = document.getElementById('favorite-text');
+                const textSpan = btn.querySelector('.favorite-text');
                 if (isFavorite) {
                     btn.classList.remove('btn-outline-secondary');
                     btn.classList.add('btn-danger');
-                    textSpan.textContent = 'Retirer des favoris';
+                    btn.setAttribute('data-is-favorite', '1');
+                    if (textSpan) textSpan.textContent = 'Retirer des favoris';
                 } else {
                     btn.classList.remove('btn-danger');
                     btn.classList.add('btn-outline-secondary');
-                    textSpan.textContent = 'Ajouter aux favoris';
+                    btn.setAttribute('data-is-favorite', '0');
+                    if (textSpan) textSpan.textContent = 'Ajouter aux favoris';
                 }
             }
 
-            btn.addEventListener('click', async function(e) {
+            // Initialiser l'état du bouton
+            updateButtonState();
+
+            btn.addEventListener('click', function(e) {
                 e.preventDefault();
+                btn.disabled = true;
                 
-                try {
-                    const method = isFavorite ? 'DELETE' : 'POST';
-                    const response = await fetch(`/livres/${livreid}/favorite`, {
-                        method: method,
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Content-Type': 'application/json'
-                        }
-                    });
+                const method = isFavorite ? 'DELETE' : 'POST';
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
-                    const data = await response.json();
+                if (!csrfToken) {
+                    console.error('CSRF token non trouvé');
+                    btn.disabled = false;
+                    return;
+                }
 
+                fetch(`/livres/${livreid}/favorite`, {
+                    method: method,
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
                     if (data.success) {
                         isFavorite = !isFavorite;
+                        // Persister l'état dans localStorage
+                        if (isFavorite) {
+                            localStorage.setItem(storageKey, '1');
+                        } else {
+                            localStorage.removeItem(storageKey);
+                        }
                         updateButtonState();
                     } else {
-                        alert('Erreur: ' + data.message);
+                        alert('Erreur: ' + (data.message || 'Impossible de modifier le favori'));
                     }
-                } catch (error) {
-                    console.error('Erreur:', error);
-                    alert('Une erreur est survenue');
-                }
+                })
+                .catch(error => {
+                    console.error('Erreur détaillée:', error);
+                    alert('Une erreur est survenue: ' + error.message);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                });
             });
-        });
+        })();
         </script>
     @else
         {{-- Pour les non-bibliothécaires: afficher les favoris du bibliothécaire --}}

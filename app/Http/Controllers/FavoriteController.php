@@ -9,14 +9,6 @@ use Illuminate\Http\Request;
 class FavoriteController extends Controller
 {
     /**
-     * Middleware pour authentification
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
      * Ajouter un livre aux favoris
      * Seul les bibliothécaires peuvent ajouter des favoris
      */
