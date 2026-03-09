@@ -80,12 +80,6 @@ admin_bibliotech --> UC7
 bibliothecaire_demo --> UC8
 admin_bibliotech --> UC8
 
-UC1 .left.> UC5 : <<include>>
-UC2 .left.> UC5 : <<include>>
-UC3 .left.> UC5 : <<include>>
-UC4 .left.> UC5 : <<include>>
-
-UC1 .right.> UC6 : <<extend>>
 
 legend right
 = Légende du Diagramme
